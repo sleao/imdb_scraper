@@ -5,6 +5,9 @@ TVSHOW_ID = "tt1439629"
 BASE_URL = f"https://www.imdb.com/title/{TVSHOW_ID}/episodes?season=" # we just need to add the season to the end of the line.
 NUMBER_OF_SEASONS = 6
 
+a = 'Jan. Feb. Mar. Apr. May Jun. Jul. Aug. Sep. Oct. Nov. Dec.'.split(' ')
+MONTHS = {y:x for x,y in enumerate(a,1)}
+
 # You should send the episode div and get the data back. It should work for any TV Show, btw.
 # The data we want:
 # Episode Number, Season, Episode Name, Rating and Air Date. At least for now
@@ -12,7 +15,8 @@ def getEpisodeData(episodeDiv):
     episode = {}
     try:
         episode['name'] = episodeDiv.find('a')['title']
-        episode['airdate'] = episodeDiv.find('div', {"class": "airdate"}).string.strip()
+        day, month, year = episodeDiv.find('div', {"class": "airdate"}).string.strip().split(' ')
+        episode['airdate'] = f'{MONTHS[month]}-{day}-{year}'
         season_n, episode_n = episodeDiv.find('div', {"class": "image"}).div.div.string.split(',')
         episode['season'] = season_n
         episode['episode_number'] = episode_n.strip() 
@@ -37,7 +41,7 @@ def getSeasonData(seasonDiv):
 # Now, I know that Community only has 6 seasons, so I can run a for to get every season data like this:
 
 def getTvShowData():
-    seasonsData = {}
+    # seasonsData = {}
     output = open('data.csv', 'w', encoding='utf-8')
     output.write('season;episode;episode_series;name;airdate;rating\n')
 
@@ -59,3 +63,6 @@ def getTvShowData():
             string = f"{y['season']};{y['episode_number']};{counter};{y['name']};{y['airdate']};{y['rating']}\n"
             output.write(string)
             counter+=1
+
+if __name__ == "__main__":
+    getTvShowData()
